@@ -1,51 +1,51 @@
--- Load Rayfield UI Library
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- LocalScript di StarterPlayerScripts
 
--- Create Window
-local Window = Rayfield:CreateWindow({
-    Name = "Astro Hub",
-    Icon = "star", -- Lucide icon name or Roblox asset ID (number)
-    LoadingTitle = "Astro Hub Loading",
-    LoadingSubtitle = "by Mash",
-    Theme = "Default",
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
-    DisableRayfieldPrompts = false,
-    DisableBuildWarnings = false,
+local LOWER_BRIDGE_EVENT
 
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = nil,
-        FileName = "AstroHubConfig"
-    },
+-- Temukan RemoteEvent bridge
+for _, obj in pairs(ReplicatedStorage:GetDescendants()) do
+	if obj:IsA("RemoteEvent") and obj.Name:lower():find("bridge") then
+		LOWER_BRIDGE_EVENT = obj
+		break
+	end
+end
 
-    Discord = {
-        Enabled = false,
-        Invite = "noinvitelink",
-        RememberJoins = true
-    },
+if not LOWER_BRIDGE_EVENT then
+	warn("RemoteEvent untuk bridge tidak ditemukan!")
+	return
+end
 
-    KeySystem = false,
-    KeySettings = {
-        Title = "Astro Hub Key",
-        Subtitle = "Key System",
-        Note = "Contact Mash for key",
-        FileName = "AstroHubKey",
-        SaveKey = true,
-        GrabKeyFromSite = false,
-        Key = {"MashKey123"}
-    }
-})
+local bridgeLowered = false
+local timeLeft = 600 -- 10 menit awal dalam detik
 
--- OPTIONAL: Set custom loading logo
-Window:SetLoadingIcon(123456789) -- Ganti 123456789 dengan asset ID logo kamu
+-- Fungsi untuk turunkan bridge dan tambahkan 4 menit
+local function forceLowerBridge()
+	if bridgeLowered then return end
+	bridgeLowered = true
 
--- Create New Tabs
-local PlayTab      = Window:CreateTab("Play", "gamepad")
-local TeleportTab  = Window:CreateTab("Teleport", "map-pin")
-local QuestTab     = Window:CreateTab("Quest", "target")
-local ESPTab       = Window:CreateTab("ESP", "eye")
-local SettingsTab  = Window:CreateTab("Setting", "settings")
-local CreditTab    = Window:CreateTab("Credit", "info")
+	LOWER_BRIDGE_EVENT:FireServer()
+	print("Bridge diturunkan otomatis/manual!")
 
--- Load saved configuration
-Rayfield:LoadConfiguration()
+	timeLeft = timeLeft + 240 -- Tambah 4 menit (240 detik)
+end
+
+-- Keybind manual (E)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.E then
+		forceLowerBridge()
+	end
+end)
+
+-- Timer utama
+RunService.RenderStepped:Connect(function()
+	timeLeft -= RunService.RenderStepped:Wait()
+	if timeLeft <= 0 then
+		timeLeft = 0
+		forceLowerBridge()
+	end
+end)

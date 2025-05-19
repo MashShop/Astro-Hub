@@ -1,63 +1,51 @@
--- Load the Rayfield UI Library
-local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/sirius-menu/rayfield/main/source.lua"))()
+-- Load Rayfield UI Library
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- Create the main window for Astro Hub
+-- Create Window
 local Window = Rayfield:CreateWindow({
     Name = "Astro Hub",
-    LoadingTitle = "Loading Astro Hub...",
-    LoadingSubtitle = "Please wait...",
+    Icon = "star", -- Lucide icon name or Roblox asset ID (number)
+    LoadingTitle = "Astro Hub Loading",
+    LoadingSubtitle = "by Mash",
+    Theme = "Default",
+
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false,
+
     ConfigurationSaving = {
         Enabled = true,
-        FolderName = "AstroHub",
-        FileName = "settings"
+        FolderName = nil,
+        FileName = "AstroHubConfig"
     },
+
     Discord = {
         Enabled = false,
-        Invite = "https://discord.gg/jCNUFvEsUZ", -- Replace with your Discord invite link
+        Invite = "noinvitelink",
         RememberJoins = true
     },
-    KeySystem = true, -- Set to true if you want to use a key system
+
+    KeySystem = false,
+    KeySettings = {
+        Title = "Astro Hub Key",
+        Subtitle = "Key System",
+        Note = "Contact Mash for key",
+        FileName = "AstroHubKey",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = {"MashKey123"}
+    }
 })
 
--- Create a new tab in the window
-local Tab = Window:CreateTab("Main")
+-- OPTIONAL: Set custom loading logo
+Window:SetLoadingIcon(123456789) -- Ganti 123456789 dengan asset ID logo kamu
 
--- Create a button in the tab
-Tab:CreateButton({
-    Name = "Click Me!",
-    Callback = function()
-        print("Button clicked!")
-        Rayfield:Notify({
-            Title = "Astro Hub",
-            Content = "You clicked the button!",
-            Duration = 5,
-        })
-    end,
-})
+-- Create New Tabs
+local PlayTab      = Window:CreateTab("Play", "gamepad")
+local TeleportTab  = Window:CreateTab("Teleport", "map-pin")
+local QuestTab     = Window:CreateTab("Quest", "target")
+local ESPTab       = Window:CreateTab("ESP", "eye")
+local SettingsTab  = Window:CreateTab("Setting", "settings")
+local CreditTab    = Window:CreateTab("Credit", "info")
 
--- Create a toggle in the tab
-Tab:CreateToggle({
-    Name = "Enable Feature",
-    Default = false,
-    Callback = function(Value)
-        print("Feature enabled: " .. tostring(Value))
-    end,
-})
-
--- Create a slider in the tab
-Tab:CreateSlider({
-    Name = "Set Value",
-    Range = {0, 100},
-    Increment = 1,
-    Suffix = "units",
-    CurrentValue = 50,
-    Callback = function(Value)
-        print("Slider value: " .. Value)
-    end,
-})
-
--- Create a label in the tab
-Tab:CreateLabel("Welcome to Astro Hub! Customize your experience.")
-
--- Finalize the UI
-Rayfield:Init() 
+-- Load saved configuration
+Rayfield:LoadConfiguration()
